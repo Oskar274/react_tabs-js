@@ -9,27 +9,30 @@ export const tabs = [
   { id: 'tab-3', title: 'Tab 3', content: 'Some text 3' },
 ];
 
-export const TabList = ({ tabuls, selectedTab, setSelectedTab }) => {
-  const activeTab = tabuls.find(tab => tab.id === selectedTab);
+export const Tabs = ({ tabs: tabItems, activeTabId, onTabSelected }) => {
+  const activeTab = tabItems.find(t => t.id === activeTabId) || tabItems[0];
 
   return (
     <div data-cy="TabsComponent">
       <div className="tabs is-boxed">
         <ul>
-          {tabuls.map(tab => (
+          {tabItems.map(tab => (
             <li
               key={tab.id}
-              className={tab.id === selectedTab ? 'is-active' : ''}
-              data-cy="Tab"
+              className={tab.id === activeTab.id ? 'is-active' : ''}
             >
-              <button
-                type="button"
-                className="tab-button"
+              <a
+                href={`#${tab.id}`}
                 data-cy="TabLink"
-                onClick={() => setSelectedTab(tab.id)}
+                onClick={e => {
+                  e.preventDefault();
+                  if (tab.id !== activeTab.id) {
+                    onTabSelected(tab.id);
+                  }
+                }}
               >
                 {tab.title}
-              </button>
+              </a>
             </li>
           ))}
         </ul>
@@ -43,15 +46,18 @@ export const TabList = ({ tabuls, selectedTab, setSelectedTab }) => {
 };
 
 export const App = () => {
-  const [selectedTab, setSelectedTab] = useState('tab-1');
+  const [activeTabId, setActiveTabId] = useState('tab-1');
+
+  const activeTab = tabs.find(t => t.id === activeTabId) || tabs[0];
 
   return (
     <div className="section">
-      <h1 className="title">Selected tab is {selectedTab}</h1>
-      <TabList
+      <h1 className="title">Selected tab is {activeTab.title}</h1>
+
+      <Tabs
         tabs={tabs}
-        selectedTab={selectedTab}
-        setSelectedTab={setSelectedTab}
+        activeTabId={activeTabId}
+        onTabSelected={setActiveTabId}
       />
     </div>
   );
